@@ -6,6 +6,7 @@
 > - [2.4 把网页放到公网：云服务器与 Nginx](#24-把网页放到公网云服务器与-nginx)
 > - [3.1 HTML / CSS / JavaScript 是什么](#31-html--css--javascript-是什么)
 > - [3.2 三层分工总结与练习](#32-三层分工总结与练习)
+> - [3.3 Git 版本管理](#33-git-版本管理)
 
 ---
 
@@ -361,8 +362,81 @@ function changeText() {
 - CSS 盒模型、Flex 布局、响应式（媒体查询）
 - DOM 操作与事件（`addEventListener`）
 - 浏览器开发者工具（F12：Elements / Console / Network）
-- Git 版本管理，把项目推到 GitHub
 - 用 Nginx 部署 + 申请 HTTPS 证书
 
+---
 
+## 3.3 Git 版本管理
 
+### 3.3.1 Git 是什么
+
+- **给代码存档**：每次提交都是一个"存档点"，可以随时查看历史、回到任意一个版本
+- 分布式版本控制系统，官网：[git-scm.com](https://git-scm.com/)
+- **管理范围**：Git 只跟踪它所在仓库目录及其子目录里的文件；仓库外的文件不受管理
+- **适合文本类**：代码、Markdown、配置文件可以按行比较差异
+- **不适合二进制文件**：图片、视频、压缩包无法按行比对，每次改动都相当于存一整份新文件，会让仓库迅速膨胀（确需管理可用 Git LFS）
+
+### 3.3.2 首次使用：配置身份
+
+```bash
+git config --global user.name "kongbai12374"
+git config --global user.email "you@example.com"
+```
+
+- 命令顺序是 `git config --global user.name`，不是 `git config global.name`
+- `--global` 表示对当前用户全局生效，一台电脑配一次即可
+- 配置的姓名和邮箱会写进每次提交记录，用来标识"是谁提交的"
+
+### 3.3.3 三个区域与核心命令
+
+```text
+工作区（你编辑的文件）  --git add-->  暂存区  --git commit-->  版本库（历史记录）
+```
+
+| 命令 | 作用 |
+| --- | --- |
+| `git init` | 在当前目录初始化仓库，生成隐藏的 `.git` 目录 |
+| `git status` | 查看当前状态：哪些文件被修改、哪些已暂存 |
+| `git add <文件>` / `git add .` | 把改动放进暂存区 |
+| `git commit -m "说明"` | 把暂存区内容提交为一个版本 |
+| `git log --oneline` | 每条历史记录显示为一行，查看提交历史 |
+| `git checkout <分支名>` | 切换到指定分支，如 `git checkout master` |
+| `git checkout -- <文件>` | 丢弃工作区中该文件的修改，恢复到上次提交的状态 |
+
+第一次提交的完整流程：
+
+```bash
+cd zero-to-tech
+git init
+git status              # 会看到 index.html、style.css 等未跟踪文件
+git add .
+git commit -m "第一个网页"
+git log --oneline       # 输出：a1b2c3d 第一个网页
+```
+
+### 3.3.4 .gitignore：不跟踪哪些文件
+
+在仓库根目录新建 `.gitignore`，按行写上不想被 Git 管理的文件或目录：
+
+```gitignore
+node_modules/
+*.log
+.env
+dist/
+```
+
+- 用途：依赖目录、日志、编译产物、含密码的配置文件都不该进仓库
+- 注意：`.gitignore` 是"忽略清单"，**不是暂存**；暂存区是 `git add` 把改动放进去的那个区域
+- 已经被跟踪的文件后来才写进 `.gitignore` 不会自动失效，需要 `git rm --cached <文件>`
+
+### 3.3.5 分支
+
+- 每条独立的工作线叫分支，默认主分支在旧版本 Git 里叫 `master`，新版本默认叫 `main`
+- `git checkout master` = 切回主干分支
+- `git checkout` 在新版 Git 里拆成了 `git switch`（切分支）和 `git restore`（恢复文件），功能相同
+
+### 3.3.6 学习资源与练习
+
+- [Git 官方文档 / Pro Git 中文版](https://git-scm.com/book/zh/v2) —— 系统全面
+- [廖雪峰官网](https://liaoxuefeng.com/) —— 有完整的中文 Git 教程，适合入门
+- 练习：在本目录执行 `git init` → `git add .` → `git commit -m "初始版本"`，再故意改一行 CSS，用 `git status` 和 `git log --oneline` 观察变化
